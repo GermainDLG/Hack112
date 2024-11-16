@@ -17,10 +17,10 @@ def onAppStart(app):
 def redrawAll(app):
     drawRect(0, 0, app.width, app.height, fill='brown')
     drawBoard(app)
-    drawCard(app, 'h' , 7, 200, 200)
-    drawCard(app, 'd', 'K', 400, 400)
-    drawCard(app, 's', 2, 600, 600)
-    drawCard(app, 'c', 'A', 800, 800)
+    drawCard(app, 'H' , 7, 200, 200)
+    drawCard(app, 'D', 'K', 400, 400)
+    drawCard(app, 'S', 2, 600, 600)
+    drawCard(app, 'C', 'A', 800, 800)
 
 
 def drawBoard(app):
@@ -32,7 +32,7 @@ def drawCard(app, suit, val, cardX, cardY):
     drawSuit(app, val, suit, cardX, cardY)
 
 def drawValue(app, val, suit, cardX, cardY):
-    if (suit == 'h') or (suit == 'd'):
+    if (suit == 'H') or (suit == 'D'):
         color = 'red'
     else:
         color = 'black'
@@ -41,13 +41,13 @@ def drawValue(app, val, suit, cardX, cardY):
 
 
 def drawSuit(app, val, suit, cardX, cardY):
-    if suit == 'h':
+    if suit == 'H':
         drawHeart(app, cardX, cardY)
-    elif suit == 'c':
+    elif suit == 'C':
         drawClub(app, cardX, cardY)
-    elif suit == 's':
+    elif suit == 'S':
         drawSpade(app, cardX, cardY)
-    elif suit == 'd':
+    elif suit == 'D':
         drawDiamond(app, cardX, cardY)
 
 def drawHeart(app, cardX, cardY):
