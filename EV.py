@@ -1,5 +1,5 @@
 def calculateEV(hand, seen, pot, bet):
-    if board == []:
+    if seen == []:
         preflop = {"face cards":.8 , "connectors":.5, "suited":.5, "pair":.8, "suited connectors":.7, "nothing":.3, "one face":.4}
         hand = getPreflopHand(hand)
         ev = preflop[hand]
