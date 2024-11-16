@@ -29,7 +29,7 @@ class Bot:
         else:
             bet = currBet + minBet #+ evToBet(ev, potSize)
             self.bets += bet
-            return 'bet ' + str(bet)
+            return 'raise ' + str(bet)
 
 # class Player:
 
@@ -41,9 +41,9 @@ class Bot:
 #     return deck.visible
 
 
-# potSize = 
+# potSize = 0
 # minBet = 
-# def playRound()
+# def playRound(minBet, potSize, )
 #     i = 0
 #     currPlayer = 0
 #     currBet = 0
@@ -53,10 +53,20 @@ class Bot:
 #         move = player.makeMove() #will return move as a string
 #         if move == 'fold':
 #             players.remove(player)
+#             i += 1
 #             continue
 #         elif move == 'check':
 #             currPlayer += 1
+#             i += 1
 #             continue
-#         elif move == 'call'
+#         elif move[:4] == 'call':
+#             potSize += move[6:]
+#             currPlayer += 1
+#             i += 1
+#             continue
+#         elif move[:5] == 'raise':
+#             currBet = move[7:]
+#             potSize += 
+
 
 
