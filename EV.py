@@ -1,9 +1,70 @@
 def calculateEV(hand, seen, pot, bet):
-    odds = {'high card': .174, 'one pair': .499, "two pair": .652, "three of a kind": .732, "straight": .844, "flush": .915, "full house": .978, "quads": .992, "straight flush": .999, "royal flush": 1}
-    hand = getHand(hand, seen)
-    winPer = odds[hand]
-    losePer = 1 - winPer
-    return ((winPer * pot) - (losePer * bet)) / pot
+    if board == []:
+        preflop = {"face cards":.8 , "connectors":.5, "suited":.5, "pair":.8, "suited connectors":.7, "nothing":.3, "one face":.4}
+        hand = getPreflopHand(hand)
+        ev = preflop[hand]
+        return ev
+    else:
+        odds = {'high card': .174, 'one pair': .499, "two pair": .652, "three of a kind": .732, "straight": .844, "flush": .915, "full house": .978, "quads": .992, "straight flush": .999, "royal flush": 1}
+        hand = getHand(hand, seen)
+        winPer = odds[hand]
+        losePer = 1 - winPer
+        return ((winPer * pot) - (losePer * bet)) / pot
+
+
+def getPreflopHand(hand):
+    lst = []
+    for card in hand:
+        card = card.split(" ")
+        suit = card[1]
+        if card[0] == "J":
+            value = 11
+        elif card[0] == "Q":
+            value = 12
+        elif card[0] == "K":
+            value = 13
+        elif card[0] == "A":
+            value = 14
+        else:
+            value = card[0]
+        lst.append([int(value), suit])
+    
+    if lst[0][0] == lst[1][0]:
+        pair = True
+    else: pair = False
+    
+    if lst[0][0] >= 10 and lst[1][0] >= 10:
+        faceCard = True
+    else: faceCard = False
+    
+    if lst[0][0] > 10 or lst[1][0] > 10:
+        oneFaceCard = True
+    else: oneFaceCard = False
+    
+    if lst[0][1] == lst[1][1]:
+        suited = True
+    else: suited = False
+    
+    if abs(lst[0][0] - lst[1][0]) == 1:
+        connectors = True
+    else: connectors = False
+       
+       
+    if pair:
+        return "pair"
+    elif faceCard:
+        return "face cards"
+    elif suited and connectors:
+        return "suited connectors"
+    elif suited: 
+        return "suited"
+    elif connectors:
+        return "connectors"
+    elif oneFaceCard:
+        return "one face"
+    else:
+        return "nothing"
+
 
 def getHand(hand, seen):
     suits = {'H': 0, 'D': 0, 'C': 0, 'S': 0}
@@ -20,8 +81,6 @@ def getHand(hand, seen):
             value = 13
         elif card[0] == "A":
             value = 14
-            values.append(value)
-            value = 1
             values.append(value)
             continue
         else:
@@ -129,6 +188,8 @@ def isQuads(values):
 def isStraight(values):
     values = [int(x) for x in values]
     values = set(values)
+    if 14 in values:
+        values.add(1)
     values = sorted(values)
     max = len(values)
     for i in range(max):
@@ -180,5 +241,4 @@ def royal(values):
     if isStraight(straight) and straight[-1] == 14:
         return True
     else: return False
-    
     
