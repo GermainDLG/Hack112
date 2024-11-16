@@ -8,8 +8,10 @@ def calculateEV(hand, seen, pot, bet):
 def getHand(hand, seen):
     suits = {'H': 0, 'D': 0, 'C': 0, 'S': 0}
     values = []
-    for card in hand + seen:    # + deck.flop + deck.turn + deck.river:
+    for card in hand + seen:
         card = card.split(" ")
+        suit = card[1]
+        suits[suit] += 1
         if card[0] == "J":
             value = 11
         elif card[0] == "Q":
@@ -18,10 +20,12 @@ def getHand(hand, seen):
             value = 13
         elif card[0] == "A":
             value = 14
+            values.append(value)
+            value = 1
+            values.append(value)
+            continue
         else:
             value = card[0]
-        suit = card[1]
-        suits[suit] += 1
         values.append(value)
     
     
@@ -167,21 +171,6 @@ def straightFlush(cards):
             return True
     return False
 
-    
-            
-    
-    
-        
-        
-    values = [int(x) for x in values]
-    values = set(values)
-    values = sorted(values)
-    max = len(values)
-    for i in range(max):
-        num = values[i]
-        if values[i:i+5] == list(range(num,num+5)):
-            return True
-    return False
 
 def royal(values):
     values = [int(x) for x in values]
@@ -192,4 +181,4 @@ def royal(values):
         return True
     else: return False
     
-   
+    
