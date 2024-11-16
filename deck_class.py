@@ -66,4 +66,3 @@ class Deck:
             self.deck.pop(0)
             self.hand4.append(self.deck[0])
             self.deck.pop(0)
- 
