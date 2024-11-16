@@ -1,20 +1,23 @@
 from cmu_graphics import *
-import Deck
+from deck_class import Deck
+from EV import calculateEV
+
 
 class Bot:
 
-    def __init__(self, hand, difficulty):
-        botRanges = {'Easy': () , 'Medium': (), 'Hard': ()}
+    def __init__(self, hand, difficulty, deck):
+        botRanges = {'Scared': (.48,.90) , 'Medium': (.33,.75), 'Aggressive': (.25, .38)}
 
         self.difficulty = difficulty
         self.hand = hand
-        self.board = readDeck()
-        self.range = botRanges[self.difficulty]
+        self.board = ((deck.flop).append(deck.turn)).append(deck.river)
+        self.range = botRanges[difficulty]
         self.bets = 0
     
-    def makeMove(self, currBet, potSize, minBet): 
+    def makeMove(self, currBet, potSize, minBet, round): 
     #Given currBet(bet needed to stay in game) and potSize(size of pot in $$), return move as a string (check, bet, raise, bet {value})
-        ev = calculateEV(self.hand, self.board, potSize, self.bets)
+        self.visible = readBoard(self.deck, round)
+        ev = calculateEV(self.hand, self.visible, potSize, self.bets+currBet)
         min, max = self.range
         if ev < min:
             if currBet != 0:
@@ -30,43 +33,61 @@ class Bot:
             bet = currBet + minBet #+ evToBet(ev, potSize)
             self.bets += bet
             return 'raise ' + str(bet)
+    
+    def __repr__(self):
+        return f'{self.difficulty} Bot'
 
-# class Player:
+class Player:
 
-#     def __init__(self, hand):
-#         self.hand = hand
-#         self.view = readTable()
+    def __init__(self, hand):
+        self.hand = hand
+    
+    def makeMove(self, currBet, potSize, minBet, round):
+        pass
 
-# def readDeck(deck):
-#     return deck.visible
+def readBoard(deck, round):
+    if round == 0:
+        return []
+    else:
+        return self.board[:(round+2)]
+    
 
 
-# potSize = 0
-# minBet = 
-# def playRound(minBet, potSize, )
-#     i = 0
-#     currPlayer = 0
-#     currBet = 0
-#     players = [bot1, bot2, bot3, manual]
-#     while i < len(players):
-#         player = players[i]
-#         move = player.makeMove() #will return move as a string
-#         if move == 'fold':
-#             players.remove(player)
-#             i += 1
-#             continue
-#         elif move == 'check':
-#             currPlayer += 1
-#             i += 1
-#             continue
-#         elif move[:4] == 'call':
-#             potSize += move[6:]
-#             currPlayer += 1
-#             i += 1
-#             continue
-#         elif move[:5] == 'raise':
-#             currBet = move[7:]
-#             potSize += 
+potSize = 0
+minBet = 5
+def playRound(minBet, potSize):
+    i = 0
+    currPlayer = 0
+    currBet = 0
+    players = []
+    while i < len(players):
+        player = players[i]
+        if isinstance(player, Bot):
+            move = player.makeMove(currBet, potSize, minBet) #will return move as a string
+            if move == 'fold':
+                players.remove(player)
+                i += 1
+                continue
+            elif move == 'check':
+                currPlayer += 1
+                i += 1
+                continue
+            elif move[:4] == 'call':
+                potSize += move[6:]
+                currPlayer += 1
+                i += 1
+                continue
+            elif move[:5] == 'raise':
+                currBet = move[7:]
+                potSize += currBet
+                i = 0
+        else:
+            app.userTurn = True
+            move = userMove()
+            i += 1
+            continue
+
+
 
 
 
