@@ -13,10 +13,13 @@ def onAppStart(app):
     app.deck = Deck()
     app.deck.generateDeck()
     app.deck.delegateCards()
-    app.turn = 0
-    app.userTurn = False
+    app.turn = -1
+    app.userTurn = True
     app.currBet = 0
     app.round = 0
+    app.userMove =  None
+    app.raised = False
+
 
     app.board = app.deck.flop + [app.deck.river] + [app.deck.turn]
 
@@ -31,14 +34,26 @@ def onAppStart(app):
     print(app.bot3)
 
     app.minBet = 10
-    app.potSize = 0
+    app.potSize = 10
     app.players = ['user', app.bot1, app.bot2, app.bot3]
 
 def restart(app):
     app.deck = Deck()
     app.deck.generateDeck()
     app.deck.delegateCards()
-    app.turn = 0
+    app.turn = -1
+    app.userTurn = True
+    app.currBet = 0
+    app.round = 0
+    app.userMove = None
+    app.raised = False
+    app.board = app.deck.flop + [app.deck.river] + [app.deck.turn]
+    app.bot1 = Bot(app.deck.hand2, 'Scared', app.deck, app.board)
+    app.bot2 = Bot(app.deck.hand3, 'Medium', app.deck, app.board)
+    app.bot3 = Bot(app.deck.hand4, 'Aggressive', app.deck, app.board)
+    app.minBet = 10
+    app.potSize = 10
+    app.players = ['user', app.bot1, app.bot2, app.bot3]
 
 def redrawAll(app):
     drawBoard(app)
@@ -76,81 +91,91 @@ def drawCards(app):
     drawRect(295,625,100,150,fill='white')
     drawRect(405,625,100,150,fill='white')
     if(app.deck.hand1[0][-1] == 'D' or app.deck.hand1[0][-1] == 'H'):
-        drawLabel(app.deck.hand1[0],345,700,fill='red')
+        drawLabel(app.deck.hand1[0],345,700,fill='red', size=30)
     else:
-        drawLabel(app.deck.hand1[0],345,700)
+        drawLabel(app.deck.hand1[0],345,700, size=30)
     if(app.deck.hand1[1][-1] == 'D' or app.deck.hand1[1][-1] == 'H'):
-        drawLabel(app.deck.hand1[1],455,700,fill='red')
+        drawLabel(app.deck.hand1[1],455,700,fill='red', size=30)
     else:
-        drawLabel(app.deck.hand1[1],455,700)
+        drawLabel(app.deck.hand1[1],455,700, size=30)
 
 def drawRest(app):
     #Draws flop, turn, river
-    drawRect(225,225,100,150,fill='white')
-    if(app.deck.flop[0][-1] == 'D' or app.deck.flop[0][-1] == 'H'):
-        drawLabel(app.deck.flop[0],275,300,fill='red')
-    else:
-        drawLabel(app.deck.flop[0],275,300)
-    drawRect(350,225,100,150,fill='white')
-    if(app.deck.flop[1][-1] == 'D' or app.deck.flop[1][-1] == 'H'):
-        drawLabel(app.deck.flop[1],400,300,fill='red')
-    else:
-        drawLabel(app.deck.flop[1],400,300)
-    drawRect(475,225,100,150,fill='white')
-    if(app.deck.flop[2][-1] == 'D' or app.deck.flop[2][-1] == 'H'):
-        drawLabel(app.deck.flop[2],525,300,fill='red')
-    else:
-        drawLabel(app.deck.flop[2],525,300)
+    if(app.turn >= 0):
+        drawRect(225,225,100,150,fill='white')
+        if(app.deck.flop[0][-1] == 'D' or app.deck.flop[0][-1] == 'H'):
+            drawLabel(app.deck.flop[0],275,300,fill='red', size=30)
+        else:
+            drawLabel(app.deck.flop[0],275,300, size=30)
+        drawRect(350,225,100,150,fill='white')
+        if(app.deck.flop[1][-1] == 'D' or app.deck.flop[1][-1] == 'H'):
+            drawLabel(app.deck.flop[1],400,300,fill='red', size=30)
+        else:
+            drawLabel(app.deck.flop[1],400,300, size=30)
+        drawRect(475,225,100,150,fill='white')
+        if(app.deck.flop[2][-1] == 'D' or app.deck.flop[2][-1] == 'H'):
+            drawLabel(app.deck.flop[2],525,300,fill='red', size=30)
+        else:
+            drawLabel(app.deck.flop[2],525,300, size=30)
     if(app.turn >= 1):
         drawRect(275,400,100,150,fill='white')
         if(app.deck.turn[-1] == 'D' or app.deck.turn[-1] == 'H'):
-            drawLabel(app.deck.turn,325,475,fill='red')
+            drawLabel(app.deck.turn,325,475,fill='red', size=30)
         else:
-            drawLabel(app.deck.turn,325,475)
+            drawLabel(app.deck.turn,325,475, size=30)
     if(app.turn >= 2):
         drawRect(425,400,100,150,fill='white')
         if(app.deck.river[-1] == 'D' or app.deck.river[-1] == 'H'):
-            drawLabel(app.deck.river,475,475,fill='red')
+            drawLabel(app.deck.river,475,475,fill='red', size=30)
         else:
-            drawLabel(app.deck.river,475,475)
+            drawLabel(app.deck.river,475,475, size=30)
+
+    #Draws Game Over
+    if app.turn > 2:
+        drawLabel('GAME OVER',400,400, size = 50)
 
 def onKeyPress(app,key):
     if(key=='space'):
-        if(app.turn < 2):
-            app.turn += 1
-            time.sleep(2)
-            print('hello')
-            time.sleep(2)
-            print('hello')
+        if(app.turn < 3):
+            #some way to check if theyve made their move
+            time.sleep(1)
+            playRound(app, app.minBet, app.potSize, app.players)
+            if(app.raised == False):
+                app.turn += 1
+            app.userTurn = True
+
         else:
             restart(app)
 
 def onMousePress(app, mouseX, mouseY): #call, check, fold, raise
     if app.userTurn:
         if(inCallButton(mouseX, mouseY) == True):
+            print('call')
             app.userMove = f'call {app.currBet}'
         elif(inCheckButton(mouseX, mouseY) == True):
+            print('check')
             if app.currBet != 0:
                 app.userMove = 'fold'
             else:
                 app.userMove = 'check'
         elif(inRaiseButton(mouseX, mouseY) == True):
+            print('raise')
             app.userMove = f'raise {app.currBet}'
 
 def inCallButton(mouseX, mouseY):
-    buttonWidth, buttonHeight = 205/2, 180/2
+    buttonWidth, buttonHeight = 132, 90
     left, top = 530 + buttonWidth + 15, 585
     right, bottom = left + buttonWidth, top + buttonHeight
     return (left <= mouseX <= right) and (top <= mouseY <= bottom)
 
 def inCheckButton(mouseX, mouseY):
-    buttonWidth, buttonHeight = 205/2, 180/2
+    buttonWidth, buttonHeight = 132, 90
     left, top = 530, 585
     right, bottom = left + buttonWidth, top + buttonHeight
     return (left <= mouseX <= right) and (top <= mouseY <= bottom)
 
 def inRaiseButton(mouseX, mouseY):
-    buttonWidth, buttonHeight = 205/2, 180/2
+    buttonWidth, buttonHeight = 132, 90
     left, top = 530 + buttonWidth + 15, 585 + buttonHeight + 15
     right, bottom = left + buttonWidth, top + buttonHeight
     return (left <= mouseX <= right) and (top <= mouseY <= bottom)
@@ -158,65 +183,58 @@ def inRaiseButton(mouseX, mouseY):
 def playRound(app, minBet, potSize, players):
     i = 0
     currPlayer = 0
-    currBet = 0
-    while i < len(players):
+    app.currBet = 0
+    for __ in range(0,4):
         player = players[currPlayer]
         if isinstance(player, Bot):
-            move = player.makeMove(currBet, potSize, minBet) #will return move as a string
+            move = player.makeMove(app.currBet, potSize, minBet, app.turn) #will return move as a string
             if move == 'fold':
                 players.remove(player)
                 i += 1
                 print(player, move)
-                continue
             elif move == 'check':
                 currPlayer += 1
                 i += 1
                 print(player, move)
-                continue
             elif move[:4] == 'call':
-                potSize += int(move[6:])
+                app.potSize += int(move[6:])
                 currPlayer += 1
                 i += 1
                 print(player, move)
-                continue
             elif move[:5] == 'raise':
-                currBet = int(move[7:])
-                potSize += currBet
+                app.currBet = int(move[7:])
+                app.potSize += app.currBet
                 i = 0
                 currPlayer += 1
+                app.raised = True
                 print(player, move)
-                continue
         else:
-            app.currBet = currBet
-            app.userTurn = True
-            app.userMove = None
             while app.userMove == None:
-                continue
+                print('no move selected!')
             move = app.userMove
-
+            print(move)
             if move == 'fold':
                 players.remove(player)
                 i += 1
                 print(player, move)
-                continue
             elif move == 'check':
                 currPlayer += 1
                 i += 1
                 print(player, move)
-                continue
             elif move[:4] == 'call':
-                potSize += int(move[6:])
+                app.potSize += int(move[5:])
                 currPlayer += 1
                 i += 1
                 print(player, move)
-                continue
             elif move[:5] == 'raise':
-                currBet = int(move[7:])
-                potSize += currBet
+                app.currBet = int(move[6:])
+                app.potSize += app.currBet
                 i = 0
                 currPlayer += 1
                 print(player, move)
-                continue
-
+            print('made move')
+        app.userMove = None
+        if app.userTurn == True:
+            app.userTurn = False
 main()
  
