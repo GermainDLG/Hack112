@@ -1,0 +1,55 @@
+from cmu_graphics import *
+def main():
+    runApp()
+
+def onAppStart(app):
+    app.width = 1000
+    app.height = 1000
+    app.tableW = app.width - (app.width/20)
+    app.tableH = app.height - (app.height/20)
+    app.tableColor = 'green'
+    app.cardWidth = app.tableW/10
+    app.cardHeight = app.cardWidth * (11.5/8)
+
+def redrawAll(app):
+    drawRect(0, 0, app.width, app.height, fill='brown')
+    drawBoard(app)
+    drawCard(app, 'heart' , 7, 200, 200)
+
+
+def drawBoard(app):
+    drawRect((app.width/40), (app.height/40), app.tableW, app.tableH, fill=app.tableColor)
+
+def drawCard(app, suit, val, cardX, cardY):
+    drawRect(150, 150, app.cardWidth, app.cardHeight, fill='white')
+    drawValue(app, val, suit, cardX, cardY)
+    drawSuit(app, val, suit, cardX, cardY)
+
+def drawValue(app, val, suit, cardX, cardY):
+    color = 'red' if (suit == 'heart' or 'diamond') else 'black'
+    drawLabel(f'{val}', (cardX - (app.cardWidth * (2/5))), (cardY), fill=color)
+
+
+def drawSuit(app, val, suit, cardX, cardY):
+    if suit == 'heart':
+        drawHeart(app, cardX, cardY)
+    elif suit == 'club':
+        drawClub(app)
+    elif suit == 'spade':
+        drawSpade(app)
+    elif suit == 'diamond':
+        drawDiamond(app)
+
+def drawHeart(app, cardX, cardY):
+    drawRegularPolygon(cardX, cardY, (app.cardWidth/12), 3, rotateAngle = 180)
+    drawArc(cardX, cardY - (app.cardWidth/12)/2, (app.cardWidth/12)/2, (app.cardWidth/12)/2, 0, 180)
+    drawArc(cardX, cardY + (app.cardWidth/12)/2, (app.cardWidth/12)/2, (app.cardWidth/12)/2, 0, 180)
+
+def drawClub(app):
+    drawRegularPolygon(200, 200, 3, fill = 'red')
+
+def drawSpade(app):
+    drawRegularPolygon(200, 200, 3, fill = 'red')
+
+def drawDiamond(app):
+    drawRegularPolygon(200, 200, 3, fill = 'red')
