@@ -1,5 +1,5 @@
 def calculateEV(hand, seen, pot, bet):
-    if seen == []:
+    if board == []:
         preflop = {"face cards":.8 , "connectors":.5, "suited":.5, "pair":.8, "suited connectors":.7, "nothing":.3, "one face":.4}
         hand = getPreflopHand(hand)
         ev = preflop[hand]
@@ -84,47 +84,43 @@ def getHand(hand, seen):
             values.append(value)
             continue
         else:
-            value = card[0]
+            value = int(card[0])
         values.append(value)
-    
     
     for suit in suits:
         if suits[suit] >= 5:
             flush = True
-        else:
-            flush = False
-
         if isStraight(values):
             straight = True
         else:
             straight = False
 
-        if straightFlush(hand+seen):
-            if royal(values):
+    if straightFlush(hand+seen):
+        if royal(values):
                 return "royal flush"
-            else:
+        else:
                 return "straight flush"
-        elif flush:
-            return "flush"
-        elif straight:
-            return "straight"
+    elif flush:
+        return "flush"
+    elif straight:
+        return "straight"
 
-        if isQuads(values):
-            return "quads"
+    if isQuads(values):
+        return "quads"
 
-        if isFullHouse(values):
-            return "full house"
+    if isFullHouse(values):
+        return "full house"
 
-        if trips(values):
-            return "three of a kind"
+    if trips(values):
+        return "three of a kind"
         
-        if twoPair(values):
-            return "two pair"
+    if twoPair(values):
+        return "two pair"
 
-        if onePair(values):
-            return "one pair"
+    if onePair(values):
+        return "one pair"
             
-        return "high card"
+    return "high card"
 
 def onePair(values):
     if len(set(values)) == len(values) - 1:
@@ -242,3 +238,201 @@ def royal(values):
         return True
     else: return False
     
+    
+
+    
+def winner(hands, board):
+    d = {}
+    scores = {}
+    for hand1 in hands:
+        hand = (hand1[0], hand1[1])
+        d[hand] = getHand(list(hand), board)
+        if d[hand] == "royal flush":
+            scores[hand] = 270 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "straight flush":
+            scores[hand] = 240 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "quads":
+            scores[hand] = 210 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "full house":
+            scores[hand] = 180 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "flush":
+            scores[hand] = 150 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "straight":
+            scores[hand] = 120 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "three of a kind":
+            scores[hand] = 90 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "two pair":
+            scores[hand] = 60 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "one pair":
+            scores[hand] = 30 + tiebreaker(bestHand(hand1, board))
+        elif d[hand] == "high card":
+            scores[hand] = 0 + tiebreaker(bestHand(hand1, board))
+    best = 0
+    winningHands = set()
+    for hand in scores:
+        if scores[hand] > best:
+            winningHands = {hand}
+            best = scores[hand]
+        elif scores[hand] == best:
+            winningHands.add(hand)
+    return winningHands
+    
+            
+def bestHand(hand, board):
+    cards = []
+    suits = {'H': 0, 'D': 0, 'C': 0, 'S': 0}
+    values = {2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0, 13:0, 14:0}
+    typeHand = getHand(hand, board)
+    for card in hand + board:
+        card = card.split(" ")
+        suit = card[1]
+        suits[suit] += 1
+        if card[0] == "J":
+            value = 11
+        elif card[0] == "Q":
+            value = 12
+        elif card[0] == "K":
+            value = 13
+        elif card[0] == "A":
+            value = 14
+        else:
+            value = int(card[0])
+        values[value] += 1
+        cards.append((value, suit))
+    cards = sorted(cards)
+    newCards = []
+    if typeHand == "straight flush" or typeHand == "flush":
+        for hand in cards:
+            value, suit = hand
+            if suits[suit] >= 5:
+                newCards.append(hand)
+        return newCards
+    if typeHand == "high card":
+        return cards[-5:]
+    if typeHand == "one pair":
+        for hand in cards:
+            value, suit = hand
+            if values[value] == 2:
+                newCards.append(hand)
+        while len(newCards) != 5:
+            if cards[-1] not in newCards:
+                newCards.append(cards[-1])
+            else: cards.pop()
+        return list(reversed(newCards))
+    if typeHand == "two pair":
+        for hand in cards:
+            value, suit = hand
+            if values[value] == 2:
+                newCards.append(hand)
+        while len(newCards) != 5:
+            if cards[-1] not in newCards:
+                newCards.append(cards[-1])
+            else: cards.pop()
+        return list(reversed(newCards))
+    if typeHand == "full house":
+        for hand in cards:
+            value, suit = hand
+            if values[value] >= 2:
+                newCards.append(hand)
+        return list(reversed(newCards))
+    if typeHand == "three of a kind":
+        for hand in cards:
+            value, suit = hand
+            if values[value] == 3:
+                newCards.append(hand)
+        while len(newCards) != 5:
+            if cards[-1] not in newCards:
+                newCards.append(cards[-1])
+            else: cards.pop()
+        return list(reversed(newCards))
+    if typeHand == "quads":
+        for hand in cards:
+            value, suit = hand
+            if values[value] == 4:
+                newCards.append(hand)
+        while len(newCards) != 5:
+            if cards[-1] not in newCards:
+                newCards.append(cards[-1])
+            else: cards.pop()
+        return list(reversed(newCards))
+    if typeHand == "straight":
+        nums = []
+        for card in hand + board:
+            card = card.split(" ")
+            suit = card[1]
+            suits[suit] += 1
+            if card[0] == "J":
+                value = 11
+            elif card[0] == "Q":
+                value = 12
+            elif card[0] == "K":
+                value = 13
+            elif card[0] == "A":
+                value = 14
+            else:
+                value = int(card[0])
+            nums.append(value)
+        nums = sorted(nums)
+        while len(cards) >= 5:
+            seen = hand+board
+            if isStraight(nums[-5:]):
+                return cards[-5:]
+            else:
+                cards.pop()
+            
+        
+        
+def tiebreaker(hand):
+    accHand = []
+    for card in hand:
+        value, suit = card
+        accHand.append(f"{value} {suit}")
+    typeHand = getHand(accHand, [])
+    if typeHand == "straight" or typeHand == "straight flush" or typeHand == "quads":
+        card = hand[-1]
+        value, suit = card
+        return value
+    elif typeHand == "flush":
+        card = hand[-1]
+        value1, suit1 = card
+        card = hand[-2]
+        value2, suit2 = card
+        return value1 + value2
+    elif typeHand == "three of a kind":
+        card = hand[-1]
+        value1, suit1 = card
+        card = hand[-4]
+        value2, suit2 = card
+        return value1 + value2
+    elif typeHand == "one pair":
+        card = hand[-1]
+        value1, suit1 = card
+        card = hand[-3]
+        value2, suit2 = card
+        return value1 + value2
+    elif typeHand == "high card":
+        card = hand[-1]
+        value1, suit1 = card
+        card = hand[-2]
+        value2, suit2 = card
+        return value1 + value2
+    elif typeHand == "two pair":
+        card = hand[-1]
+        value1, suit1 = card
+        card = hand[-3]
+        value2, suit2 = card
+        return value1 + value2
+    elif typeHand == "full house":
+        card = hand[-1]
+        value1, suit1 = card
+        card = hand[-4]
+        value2, suit2 = card
+        return value1 + value2
+        
+        
+        
+        
+        
+    
+
+        
