@@ -19,6 +19,7 @@ def onAppStart(app):
     app.round = 0
     app.userMove =  None
     app.raised = False
+    app.gameOver = False
 
 
     app.board = app.deck.flop + [app.deck.river] + [app.deck.turn]
@@ -47,6 +48,7 @@ def restart(app):
     app.round = 0
     app.userMove = None
     app.raised = False
+    app.gameOver = False
     app.board = app.deck.flop + [app.deck.river] + [app.deck.turn]
     app.bot1 = Bot(app.deck.hand2, 'Scared', app.deck, app.board)
     app.bot2 = Bot(app.deck.hand3, 'Medium', app.deck, app.board)
@@ -73,6 +75,8 @@ def drawBoard(app):
     drawRect(625,410,150,100,fill='black')
     drawRect(295,25,100,150,fill='black')
     drawRect(405,25,100,150,fill='black')
+    #Draws Pot
+    drawLabel(f'Pot Size: {app.potSize}', 200, 700, size=30)
     #Draws Log
     drawRect(515,20,250,175, border='black', fill='white')
     #Draws Buttons
@@ -131,21 +135,24 @@ def drawRest(app):
             drawLabel(app.deck.river,475,475, size=30)
 
     #Draws Game Over
-    if app.turn > 2:
+    if app.gameOver == True:
         drawLabel('GAME OVER',400,400, size = 50)
 
 def onKeyPress(app,key):
     if(key=='space'):
-        if(app.turn < 3):
-            #some way to check if theyve made their move
-            time.sleep(1)
-            playRound(app, app.minBet, app.potSize, app.players)
-            if(app.raised == False):
-                app.turn += 1
-            app.userTurn = True
-
-        else:
+        print(f'game over? {app.gameOver}')
+        if(app.gameOver == True):
             restart(app)
+        else:
+            if(app.turn < 3):
+                #some way to check if theyve made their move
+                time.sleep(1)
+                playRound(app, app.minBet, app.potSize, app.players)
+                if(app.raised == False):
+                    app.turn += 1
+                app.userTurn = True
+            else:
+                app.gameOver = True
 
 def onMousePress(app, mouseX, mouseY): #call, check, fold, raise
     if app.userTurn:
@@ -153,11 +160,12 @@ def onMousePress(app, mouseX, mouseY): #call, check, fold, raise
             print('call')
             app.userMove = f'call {app.currBet}'
         elif(inCheckButton(mouseX, mouseY) == True):
-            print('check')
             if app.currBet != 0:
                 app.userMove = 'fold'
+                print('fold')
             else:
                 app.userMove = 'check'
+                print('check')
         elif(inRaiseButton(mouseX, mouseY) == True):
             print('raise')
             app.userMove = f'raise {app.currBet}'
@@ -188,31 +196,7 @@ def playRound(app, minBet, potSize, players):
         player = players[currPlayer]
         if isinstance(player, Bot):
             move = player.makeMove(app.currBet, potSize, minBet, app.turn) #will return move as a string
-            if move == 'fold':
-                players.remove(player)
-                i += 1
-                print(player, move)
-            elif move == 'check':
-                currPlayer += 1
-                i += 1
-                print(player, move)
-            elif move[:4] == 'call':
-                app.potSize += int(move[6:])
-                currPlayer += 1
-                i += 1
-                print(player, move)
-            elif move[:5] == 'raise':
-                app.currBet = int(move[7:])
-                app.potSize += app.currBet
-                i = 0
-                currPlayer += 1
-                app.raised = True
-                print(player, move)
-        else:
-            while app.userMove == None:
-                print('no move selected!')
-            move = app.userMove
-            print(move)
+            print(f'bot move {move}')
             if move == 'fold':
                 players.remove(player)
                 i += 1
@@ -231,10 +215,37 @@ def playRound(app, minBet, potSize, players):
                 app.potSize += app.currBet
                 i = 0
                 currPlayer += 1
+                app.raised = True
+                print(player, move)
+        else:
+            while app.userMove == None:
+                continue
+            move = app.userMove
+            print(f'player move: {move}')
+            if move == 'fold':
+                print('player folded')
+                i += 1
+                print(player, move)
+                app.gameOver = True
+                print(f'game over: {app.gameOver}')
+            elif move == 'check':
+                currPlayer += 1
+                i += 1
+                print(player, move)
+            elif move[:4] == 'call':
+                app.potSize += int(move[5:])
+                currPlayer += 1
+                i += 1
+                print(player, move)
+            elif move[:5] == 'raise':
+                app.currBet = int(move[6:])
+                app.potSize += app.currBet
+                i = 0
+                currPlayer += 1
                 print(player, move)
             print('made move')
-        app.userMove = None
-        if app.userTurn == True:
-            app.userTurn = False
+    app.userMove = None
+    if app.userTurn == True:
+        app.userTurn = False
 main()
  
