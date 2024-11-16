@@ -1,3 +1,28 @@
 from cmu_graphics import *
 
-print('hello')
+class Deck:
+    def __init__(self):
+        self.deck = []
+        self.river = []
+        self.flush = []
+    
+    def generateDeck(self):
+        for num in range(1,14):
+            for letter in ['C', 'H', 'S', 'D']:
+                if(num == 11):
+                    self.deck.append('Jack ' + letter)
+                elif(num == 12):
+                    self.deck.append('Queen ' + letter)
+                elif(num == 13):
+                    self.deck.append('King ' + letter)
+                elif(num == 1):
+                    self.deck.append('Ace ' + letter)
+                else:
+                    self.deck.append(str(num) + letter)
+    
+    def __repr__(self):
+        return f'{self.deck}'
+
+test = Deck()
+test.generateDeck()
+print(test)
