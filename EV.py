@@ -87,13 +87,13 @@ def getHand(hand, seen):
             value = int(card[0])
         values.append(value)
     
+    flush = False
+    straight = True
     for suit in suits:
         if suits[suit] >= 5:
             flush = True
         if isStraight(values):
             straight = True
-        else:
-            straight = False
 
     if straightFlush(hand+seen):
         if royal(values):
