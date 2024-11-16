@@ -1,4 +1,5 @@
 from cmu_graphics import *
+from deck_class import Deck
 
 def main():
     runApp()
@@ -6,11 +7,77 @@ def main():
 def onAppStart(app):
     app.width = 800
     app.height = 800
-    pass
+    app.deck = Deck()
+    app.deck.generateDeck()
+    app.deck.delegateCards()
+    app.turn = 0
+
+def restart(app):
+    app.deck = Deck()
+    app.deck.generateDeck()
+    app.deck.delegateCards()
+    app.turn = 0
 
 def redrawAll(app):
+    drawBoard(app)
+    drawCards(app)
+    drawRest(app)
+
+def drawBoard(app):
+    #Draws board
     drawRect(0, 0, app.width, app.height, fill='brown')
-    pass
+    drawRect(50,50, app.width-100,app.height-100,fill='green')
+    for x,y in [(50,50), (50,app.height-50), (app.width-50,app.height-50), (app.width-50,50)]:
+        drawCircle(x,y,50,fill='brown')
+    #Draws NPC Cards
+    drawRect(25,300,150,100,fill='black')
+    drawRect(25,410,150,100,fill='black')
+    drawRect(625,300,150,100,fill='black')
+    drawRect(625,410,150,100,fill='black')
+    drawRect(295,25,100,150,fill='black')
+    drawRect(405,25,100,150,fill='black')
+
+def drawCards(app):
+    #Draws player cards
+    drawRect(295,625,100,150,fill='white')
+    drawRect(405,625,100,150,fill='white')
+    if(app.deck.hand1[0][-1] == 'D' or app.deck.hand1[0][-1] == 'H'):
+        drawLabel(app.deck.hand1[0],345,700,fill='red')
+    else:
+        drawLabel(app.deck.hand1[0],345,700)
+    if(app.deck.hand1[1][-1] == 'D' or app.deck.hand1[0][-1] == 'H'):
+        drawLabel(app.deck.hand1[1],455,700,fill='red')
+    else:
+        drawLabel(app.deck.hand1[1],455,700)
+
+def drawRest(app):
+    #Draws flop, turn, river
+    drawRect(225,225,100,150,fill='white')
+    drawLabel(app.deck.flop[0],275,300)
+    drawRect(350,225,100,150,fill='white')
+    drawLabel(app.deck.flop[1],400,300)
+    drawRect(475,225,100,150,fill='white')
+    drawLabel(app.deck.flop[2],525,300)
+    if(app.turn >= 1):
+        drawRect(275,400,100,150,fill='white')
+        if(app.deck.turn[-1] == 'D' or app.deck.turn[-1] == 'H'):
+            drawLabel(app.deck.turn,325,475,fill='red')
+        else:
+            drawLabel(app.deck.turn,325,475)
+    if(app.turn >= 2):
+        drawRect(425,400,100,150,fill='white')
+        if(app.deck.river[-1] == 'D' or app.deck.river[-1] == 'H'):
+            drawLabel(app.deck.river,475,475,fill='red')
+        else:
+            drawLabel(app.deck.river,475,475)
+
+def onKeyPress(app,key):
+    if(key=='space'):
+        if(app.turn < 2):
+            app.turn += 1
+        else:
+            restart(app)
+
 
 
 

@@ -11,7 +11,7 @@ class Deck:
         self.hand2 = []
         self.hand3 = []
         self.hand4 = []
-        self.turn = 0
+        self.showing = []
 
     
     def generateDeck(self):
@@ -66,3 +66,8 @@ class Deck:
             self.deck.pop(0)
             self.hand4.append(self.deck[0])
             self.deck.pop(0)
+        self.showing.append(self.flop)
+
+test = Deck()
+test.generateDeck()
+test.delegateCards()
