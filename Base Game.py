@@ -137,22 +137,24 @@ def drawRest(app):
     #Draws Game Over
     if app.gameOver == True:
         drawLabel('GAME OVER',400,400, size = 50)
+        drawLabel('Press Spacebar to restart!',400,400,size = 35)
 
 def onKeyPress(app,key):
-    if(key=='space'):
-        print(f'game over? {app.gameOver}')
-        if(app.gameOver == True):
-            restart(app)
-        else:
-            if(app.turn < 3):
-                #some way to check if theyve made their move
-                time.sleep(1)
-                playRound(app, app.minBet, app.potSize, app.players)
-                if(app.raised == False):
-                    app.turn += 1
-                app.userTurn = True
+    if(app.userMove != None):
+        if(key=='space'):
+            print(f'game over? {app.gameOver}')
+            if(app.gameOver == True):
+                restart(app)
             else:
-                app.gameOver = True
+                if(app.turn < 3):
+                    #some way to check if theyve made their move
+                    time.sleep(1)
+                    playRound(app, app.minBet, app.potSize, app.players)
+                    if(app.raised == False):
+                        app.turn += 1
+                    app.userTurn = True
+                else:
+                    app.gameOver = True
 
 def onMousePress(app, mouseX, mouseY): #call, check, fold, raise
     if app.userTurn:
