@@ -6,11 +6,12 @@ class Deck:
         self.deck = []
         self.river = ''
         self.turn = ''
-        self.flush = []
+        self.flop = []
         self.hand1 = []
         self.hand2 = []
         self.hand3 = []
         self.hand4 = []
+        self.turn = 0
 
     
     def generateDeck(self):
@@ -37,11 +38,39 @@ class Deck:
         self.deck = randomDeck
 
     def __repr__(self):
-        return f'{self.deck}'
+        return f'''
+        deck = {self.deck}
+        flop = {self.flop}
+        river = {self.river}
+        turn = {self.turn}
+        hand1 = {self.hand1}
+        hand2 = {self.hand2}
+        hand3 = {self.hand3}
+        hand4 = {self.hand4}
+        '''
     
-    def pickCard(self): #used for hand, river, flush, 
-        pass
+    def delegateCards(self): #used for hand, river, flush, 
+        self.river = self.deck[0]
+        self.deck.pop(0)
+        self.turn = self.deck[0]
+        self.deck.pop(0)
+        while len(self.flop) < 3:
+            self.flop.append(self.deck[0])
+            self.deck.pop(0)
+        while (len(self.hand1) < 2):
+            self.hand1.append(self.deck[0])
+            self.deck.pop(0)
+            self.hand2.append(self.deck[0])
+            self.deck.pop(0)
+            self.hand3.append(self.deck[0])
+            self.deck.pop(0)
+            self.hand4.append(self.deck[0])
+            self.deck.pop(0)
+ 
 
 test = Deck()
 test.generateDeck()
+test.delegateCards()
+
 print(test)
+print(len(test.deck))
