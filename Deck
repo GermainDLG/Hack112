@@ -1,27 +1,46 @@
 from cmu_graphics import *
+import random
 
 class Deck:
     def __init__(self):
         self.deck = []
-        self.river = []
+        self.river = ''
+        self.turn = ''
         self.flush = []
+        self.hand1 = []
+        self.hand2 = []
+        self.hand3 = []
+        self.hand4 = []
+
     
     def generateDeck(self):
+        fullDeck = []
+        randomDeck = []
         for num in range(1,14):
             for letter in ['C', 'H', 'S', 'D']:
                 if(num == 11):
-                    self.deck.append('Jack ' + letter)
+                    fullDeck.append('J ' + letter)
                 elif(num == 12):
-                    self.deck.append('Queen ' + letter)
+                    fullDeck.append('Q ' + letter)
                 elif(num == 13):
-                    self.deck.append('King ' + letter)
+                    fullDeck.append('K ' + letter)
                 elif(num == 1):
-                    self.deck.append('Ace ' + letter)
+                    fullDeck.append('A ' + letter)
                 else:
-                    self.deck.append(str(num) + letter)
-    
+                    fullDeck.append(str(num) + ' ' + letter)
+
+        while(set(fullDeck) != set(randomDeck)):
+            randomCard = random.randint(0,51)
+            if fullDeck[randomCard] not in randomDeck:
+                randomDeck.append(fullDeck[randomCard])
+        
+        self.deck = randomDeck
+
     def __repr__(self):
         return f'{self.deck}'
+    
+    def pickCard(self): #used for hand, river, flush, 
+        pass
 
 test = Deck()
 test.generateDeck()
