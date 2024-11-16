@@ -10,46 +10,101 @@ def onAppStart(app):
     app.tableColor = 'green'
     app.cardWidth = app.tableW/10
     app.cardHeight = app.cardWidth * (11.5/8)
+    app.shapeRadius = app.cardWidth/12
+    app.sideX = app.cardWidth*2/5
+    app.sideY = app.cardHeight*2/5
 
 def redrawAll(app):
     drawRect(0, 0, app.width, app.height, fill='brown')
     drawBoard(app)
-    drawCard(app, 'heart' , 7, 200, 200)
+    drawCard(app, 'h' , 7, 200, 200)
+    drawCard(app, 'd', 'K', 400, 400)
+    drawCard(app, 's', 2, 600, 600)
+    drawCard(app, 'c', 'A', 800, 800)
 
 
 def drawBoard(app):
     drawRect((app.width/40), (app.height/40), app.tableW, app.tableH, fill=app.tableColor)
 
 def drawCard(app, suit, val, cardX, cardY):
-    drawRect(150, 150, app.cardWidth, app.cardHeight, fill='white')
+    drawRect(cardX, cardY, app.cardWidth, app.cardHeight, fill='white', align = 'center')
     drawValue(app, val, suit, cardX, cardY)
     drawSuit(app, val, suit, cardX, cardY)
 
 def drawValue(app, val, suit, cardX, cardY):
-    color = 'red' if (suit == 'heart' or 'diamond') else 'black'
-    drawLabel(f'{val}', (cardX - (app.cardWidth * (2/5))), (cardY), fill=color)
+    if (suit == 'h') or (suit == 'd'):
+        color = 'red'
+    else:
+        color = 'black'
+    drawLabel(f'{val}', cardX - app.sideX, cardY - app.sideY, fill=color, size = 16)
+    drawLabel(f'{val}', cardX + app.sideX, cardY + app.sideY, fill=color, size = 16, rotateAngle = 180)
 
 
 def drawSuit(app, val, suit, cardX, cardY):
-    if suit == 'heart':
+    if suit == 'h':
         drawHeart(app, cardX, cardY)
-    elif suit == 'club':
-        drawClub(app)
-    elif suit == 'spade':
-        drawSpade(app)
-    elif suit == 'diamond':
-        drawDiamond(app)
+    elif suit == 'c':
+        drawClub(app, cardX, cardY)
+    elif suit == 's':
+        drawSpade(app, cardX, cardY)
+    elif suit == 'd':
+        drawDiamond(app, cardX, cardY)
 
 def drawHeart(app, cardX, cardY):
-    drawRegularPolygon(cardX, cardY, (app.cardWidth/12), 3, rotateAngle = 180)
-    drawArc(cardX, cardY - (app.cardWidth/12)/2, (app.cardWidth/12)/2, (app.cardWidth/12)/2, 0, 180)
-    drawArc(cardX, cardY + (app.cardWidth/12)/2, (app.cardWidth/12)/2, (app.cardWidth/12)/2, 0, 180)
 
-def drawClub(app):
-    drawRegularPolygon(200, 200, 3, fill = 'red')
+    drawRegularPolygon(cardX - app.sideX, cardY - app.sideY + app.cardHeight/7, app.shapeRadius, 3, rotateAngle = 180, fill = 'red')
+    drawArc(cardX - app.sideX - app.shapeRadius/2 + 1, cardY - app.sideY + app.cardHeight/7 - app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 0, 180, fill = 'red')
+    drawArc(cardX - app.sideX + app.shapeRadius/2 - 1, cardY - app.sideY + app.cardHeight/7 - app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 0, 180, fill = 'red')
 
-def drawSpade(app):
-    drawRegularPolygon(200, 200, 3, fill = 'red')
 
-def drawDiamond(app):
-    drawRegularPolygon(200, 200, 3, fill = 'red')
+    drawRegularPolygon(cardX + app.sideX, cardY + app.sideY - app.cardHeight/7 + 1, app.shapeRadius, 3, fill = 'red')
+    drawArc(cardX + app.sideX - app.shapeRadius/2 + 1, cardY + app.sideY - app.cardHeight/7 + app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 180, 180, fill = 'red')
+    drawArc(cardX + app.sideX + app.shapeRadius/2 - 1, cardY + app.sideY - app.cardHeight/7 + app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 180, 180, fill = 'red')
+
+
+    drawRegularPolygon(cardX, cardY + 5, app.cardWidth/3, 3,rotateAngle = 180, fill = 'red')
+    drawArc(cardX - app.cardWidth/3/2 + 4, cardY - app.cardWidth/3/2 + 5, app.cardWidth/3, app.cardWidth/3*1.5, 0, 180, fill = 'red')
+    drawArc(cardX + app.cardWidth/3/2 - 4, cardY - app.cardWidth/3/2 + 5, app.cardWidth/3, app.cardWidth/3*1.5, 0, 180, fill = 'red')
+
+def drawClub(app, cardX, cardY):
+    drawCircle(cardX - app.sideX, cardY - app.sideY + app.cardWidth/7, app.shapeRadius*3/5)
+    drawCircle(cardX - app.sideX - app.shapeRadius*3/5 + 1, cardY - app.sideY + app.cardWidth/7 + app.shapeRadius*3/5 + 1, app.shapeRadius*3/5)
+    drawCircle(cardX - app.sideX + app.shapeRadius*3/5 - 1, cardY - app.sideY + app.cardWidth/7 + app.shapeRadius*3/5 + 1, app.shapeRadius*3/5)
+    drawRegularPolygon(cardX - app.sideX, cardY - app.sideY + app.cardHeight/7 + app.shapeRadius*3/5 + 1, app.shapeRadius/3, 3, rotateAngle = 0, fill = 'black')
+
+    drawCircle(cardX + app.sideX, cardY + app.sideY - app.cardWidth/7, app.shapeRadius*3/5)
+    drawCircle(cardX + app.sideX - app.shapeRadius*3/5 + 1, cardY + app.sideY - app.cardWidth/7 - app.shapeRadius*3/5 - 1, app.shapeRadius*3/5)
+    drawCircle(cardX + app.sideX + app.shapeRadius*3/5 - 1, cardY + app.sideY - app.cardWidth/7 - app.shapeRadius*3/5 - 1, app.shapeRadius*3/5)
+    drawRegularPolygon(cardX + app.sideX, cardY + app.sideY - app.cardHeight/7 - app.shapeRadius*3/5 - 1, app.shapeRadius/3, 3, rotateAngle = 180, fill = 'black')
+
+    drawCircle(cardX, cardY - app.shapeRadius*12/5 + 4, app.shapeRadius*12/5)
+    drawCircle(cardX - app.shapeRadius*12/5 + 1, cardY + app.shapeRadius*12/5 + 5 - app.shapeRadius*12/5, app.shapeRadius*12/5)
+    drawCircle(cardX + app.shapeRadius*12/5 - 1, cardY + app.shapeRadius*12/5 + 5 - app.shapeRadius*12/5, app.shapeRadius*12/5)
+    drawRegularPolygon(cardX, cardY + app.cardWidth/5 + 5, app.cardWidth/3/3, 3, rotateAngle = 0, fill = 'black')
+
+def drawSpade(app, cardX, cardY):
+    drawRegularPolygon(cardX - app.sideX, cardY - app.sideY + app.cardHeight/7, app.shapeRadius, 3, rotateAngle = 0, fill = 'black')
+    drawArc(cardX - app.sideX - app.shapeRadius/2 + 1, cardY - app.sideY + app.cardHeight/7 + app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 180, 180, fill = 'black')
+    drawArc(cardX - app.sideX + app.shapeRadius/2 - 1, cardY - app.sideY + app.cardHeight/7 + app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 180, 180, fill = 'black')
+    drawRegularPolygon(cardX - app.sideX, cardY - app.sideY + app.cardHeight/7 + app.shapeRadius*3/2, app.shapeRadius/3, 3, fill = 'black')
+
+
+    drawRegularPolygon(cardX + app.sideX, cardY + app.sideY - app.cardHeight/7 - 1, app.shapeRadius, 3, rotateAngle = 180, fill = 'black')
+    drawArc(cardX + app.sideX - app.shapeRadius/2 + 1, cardY + app.sideY - app.cardHeight/7 - app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 0, 180, fill = 'black')
+    drawArc(cardX + app.sideX + app.shapeRadius/2 - 1, cardY + app.sideY - app.cardHeight/7 - app.shapeRadius/2, app.shapeRadius, app.shapeRadius*1.5, 0, 180, fill = 'black')
+    drawRegularPolygon(cardX + app.sideX, cardY + app.sideY - app.cardHeight/7 - app.shapeRadius*3/2, app.shapeRadius/3, 3, rotateAngle = 180, fill = 'black')
+
+
+    drawRegularPolygon(cardX, cardY - 2, app.cardWidth/3, 3, rotateAngle = 0, fill = 'black')
+    drawArc(cardX - app.cardWidth/3/2 + 4, cardY + app.cardWidth/3/2 - 3, app.cardWidth/3, app.cardWidth/3*1.5, 180, 180, fill = 'black')
+    drawArc(cardX + app.cardWidth/3/2 - 4, cardY + app.cardWidth/3/2 - 3, app.cardWidth/3, app.cardWidth/3*1.5, 180, 180, fill = 'black')
+    drawRegularPolygon(cardX, cardY + app.cardWidth/2 - 7, app.cardWidth/3/3, 3, rotateAngle = 0, fill = 'black')
+
+def drawDiamond(app, cardX, cardY):
+    drawRegularPolygon(cardX - app.sideX, cardY - app.sideY + app.cardHeight/7, app.shapeRadius, 4, rotateAngle = 180, fill = 'red')
+
+    drawRegularPolygon(cardX + app.sideX, cardY + app.sideY - app.cardHeight/7 - 1, app.shapeRadius, 4 , fill = 'red')
+
+    drawRegularPolygon(cardX, cardY, app.cardWidth/3, 4, rotateAngle = 180, fill = 'red')
+
+main()
